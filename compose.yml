@@ -1,0 +1,35 @@
+services:
+  portainer:
+
+    # Imagem do Portainer Community Edition. A tag 'sts' usa a versão de suporte de curto prazo mais recente (Possui suporte ao Podman).
+    image: docker.io/portainer/portainer-ce:sts
+
+    container_name: portainer
+    # Portainer precisa de acesso privilegiado para gerenciar o ambiente Podman completamente.
+
+    privileged: true
+    # Mapeamento de portas:
+    # 9443: Porta principal para a interface web (HTTPS).
+    # 8000: Usada pelo túnel para os Edge Agents (opcional).
+
+    ports:
+      - "9443:9443"
+      - "8000:8000"
+
+    volumes:
+      # Mapeia o socket do Podman para dentro do contêiner.
+      # Portainer foi projetado para o socket do Docker, mas o Podman cria um link de compatibilidade.
+
+      # Este é o caminho padrão para o socket do Podman em modo rootful.
+      - /run/podman/podman.sock:/var/run/docker.sock
+
+      # Volume nomeado para persistir os dados do Portainer (configurações, usuários, etc.).
+      - portainer_data:/data
+
+    # Garante que o Portainer reinicie automaticamente em caso de falha ou após um reboot do sistema.
+    restart: always
+
+# Define o volume nomeado que será gerenciado pelo Podman.
+volumes:
+  portainer_data:
+    name: portainer_data
