@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: docker.io/mariadb:10.6
+    container_name: nextcloud_db
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=seu_password_super_secreto
+      - MYSQL_PASSWORD=nextcloud_password
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  app:
+    image: docker.io/nextcloud
+    container_name: nextcloud_app
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - nextcloud_data:/var/www/html
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+    name: nextcloud_db_data
+  nextcloud_data:
+    name: nextcloud_app_data
